@@ -66,7 +66,7 @@ function ensureSession(PDO $pdo, string $sid): void {
 }
 
 function seedAppointments(PDO $pdo, string $sid): void {
-    $monday = new DateTimeImmutable('monday this week');
+    $monday = demoWeekStart();
 
     $stmt = $pdo->prepare(
         'INSERT INTO appointments (session_id, service_id, date, time, customer_name, customer_phone)
