@@ -46,15 +46,33 @@ function networkCheck(): string {
     return $code > 0 ? "reachable (HTTP $code)" : "BLOCKED - $err";
 }
 
+/** Can we actually create and write the database file where DB_PATH points? */
+function storageCheck(): string {
+    $path = env('DB_PATH', './data/app.db');
+    $dir  = dirname($path);
+
+    if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
+        return "FAIL cannot create $dir";
+    }
+    $probe = $dir . '/.write-probe';
+    if (@file_put_contents($probe, 'ok') === false) {
+        return "FAIL not writable: $dir";
+    }
+    @unlink($probe);
+    return "writable ($dir)";
+}
+
 $checks = [
-    'PHP version'         => PHP_VERSION,
-    'pdo_sqlite'          => extension_loaded('pdo_sqlite') ? 'ok' : 'MISSING',
-    'curl'                => extension_loaded('curl')       ? 'ok' : 'MISSING',
-    'mbstring'            => extension_loaded('mbstring')   ? 'ok' : 'MISSING',
-    'ANTHROPIC_API_KEY'   => env('ANTHROPIC_API_KEY') !== '' ? 'set' : 'not set',
-    'ANTHROPIC_MODEL'     => env('ANTHROPIC_MODEL', '(unset)'),
-    'Server time (Athens)'=> date('Y-m-d H:i:s') . ' — ' . date('l'),
-    'api.anthropic.com'   => networkCheck(),
+    'PHP version'          => PHP_VERSION,
+    'pdo_sqlite'           => extension_loaded('pdo_sqlite') ? 'ok' : 'MISSING',
+    'curl'                 => extension_loaded('curl')       ? 'ok' : 'MISSING',
+    'mbstring'             => extension_loaded('mbstring')   ? 'ok' : 'MISSING',
+    'ANTHROPIC_API_KEY'    => env('ANTHROPIC_API_KEY') !== '' ? 'set' : 'not set',
+    'ANTHROPIC_MODEL'      => env('ANTHROPIC_MODEL', '(unset)'),
+    'DB_PATH'              => env('DB_PATH', '(unset)'),
+    'Storage'              => storageCheck(),
+    'Server time (Athens)' => date('Y-m-d H:i:s') . ' - ' . date('l'),
+    'api.anthropic.com'    => networkCheck(),
 ];
 ?>
 <!doctype html>
@@ -62,7 +80,7 @@ $checks = [
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Receptionist — health check</title>
+  <title>AI Receptionist - health check</title>
   <style>
     body { font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
            background: #0f0f0f; color: #e8e8e8; padding: 2rem; }
@@ -74,10 +92,14 @@ $checks = [
   </style>
 </head>
 <body>
-  <h1>AI Receptionist — step 0 health check</h1>
+  <h1>AI Receptionist - step 0 health check</h1>
   <table>
     <?php foreach ($checks as $label => $value): ?>
-      <?php $bad = str_contains($value, 'MISSING') || str_contains($value, 'BLOCKED'); ?>
+      <?php
+        $bad = str_contains($value, 'MISSING')
+            || str_contains($value, 'BLOCKED')
+            || str_contains($value, 'FAIL');
+      ?>
       <tr>
         <td><?= htmlspecialchars($label) ?></td>
         <td class="<?= $bad ? 'bad' : 'ok' ?>"><?= htmlspecialchars($value) ?></td>
