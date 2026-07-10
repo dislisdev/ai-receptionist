@@ -23,7 +23,8 @@ function weekPayload(PDO $pdo, string $sid): array {
     $days = weekDays();
 
     $stmt = $pdo->prepare(
-        "SELECT a.id, a.date, a.time, a.customer_name, s.name AS service_name
+        "SELECT a.id, a.date, a.time, a.customer_name,
+                s.name AS service_name, s.color_key
            FROM appointments a
            JOIN services s ON s.id = a.service_id
           WHERE a.session_id = ?
@@ -36,7 +37,7 @@ function weekPayload(PDO $pdo, string $sid): array {
     return [
         'days'         => $days,
         'hours'        => slotHours(),
-        'services'     => $pdo->query('SELECT id, name, duration_min, price_eur FROM services ORDER BY id')->fetchAll(),
+        'services'     => $pdo->query('SELECT id, name, duration_min, price_eur, color_key FROM services ORDER BY id')->fetchAll(),
         'appointments' => $stmt->fetchAll(),
     ];
 }

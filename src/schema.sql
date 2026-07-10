@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS services (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     name         TEXT    NOT NULL,
     duration_min INTEGER NOT NULL,
-    price_eur    REAL    NOT NULL
+    price_eur    REAL    NOT NULL,
+    color_key    TEXT    NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS sessions (

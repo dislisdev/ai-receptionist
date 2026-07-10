@@ -7,6 +7,9 @@ require_once __DIR__ . '/../../src/agent.php';
 apiBoot();
 requireMethod('POST');
 
+// A booking involves several model round-trips; give the loop room to breathe.
+set_time_limit(120);
+
 $sid = sessionId();
 $pdo = db();
 ensureSession($pdo, $sid);
@@ -23,13 +26,12 @@ if (userTurnCount($pdo, $sid) >= MAX_TURNS) {
 saveMessage($pdo, $sid, 'user', $text);
 
 try {
-    $response = callClaude(loadHistory($pdo, $sid), systemPrompt($pdo));
+    $reply = runAgentTurn($pdo, $sid);
 } catch (ClaudeException $e) {
     error_log('[chat] ' . $e->getMessage());
     jsonOut(['error' => 'agent_unavailable'], 502);
 }
 
-$reply = claudeText($response);
 if ($reply === '') $reply = 'Συγγνώμη, δεν σας κατάλαβα. Μπορείτε να το επαναλάβετε;';
 
 saveMessage($pdo, $sid, 'assistant', $reply);
