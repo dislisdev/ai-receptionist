@@ -49,7 +49,7 @@ securityHeaders();
           <div class="avatar" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M18 19a2 2 0 0 1-2 2h-3"/><rect x="2.5" y="13.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6" rx="1.6"/></svg>
           </div>
-          <div class="bubble">Γεια σας! Είμαι ο ψηφιακός βοηθός του φυσικοθεραπευτηρίου. Μπορώ να σας κλείσω ραντεβού, να ελέγξω διαθεσιμότητα ή να σας ενημερώσω για τις υπηρεσίες μας. Πώς μπορώ να βοηθήσω;</div>
+          <div class="bubble">Γεια σας! Είμαι η Ρέα, η ψηφιακή ρεσεψιόν του Φυσικοθεραπευτηρίου Κίνηση. Μπορώ να κλείσω ραντεβού, να ελέγξω διαθεσιμότητα ή να σας ενημερώσω για τις υπηρεσίες μας. Πώς μπορώ να βοηθήσω;</div>
         </div>
         <div id="typing-indicator" class="msg msg--bot" hidden>
           <div class="avatar" aria-hidden="true">
