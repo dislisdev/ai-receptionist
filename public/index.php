@@ -42,7 +42,6 @@ function networkCheck(): string {
     curl_exec($ch);
     $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err  = curl_error($ch);
-    curl_close($ch);
     // Any HTTP status means the TCP+TLS handshake worked. 401/404/405 are all fine here.
     return $code > 0 ? "reachable (HTTP $code)" : "BLOCKED - $err";
 }
