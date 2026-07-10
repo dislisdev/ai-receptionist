@@ -31,13 +31,13 @@ sessionId();
     <section class="chat" aria-label="Συνομιλία με τη ρεσεψιόν">
       <div id="messages" class="messages">
         <div class="msg agent">
-          <p>Καλησπέρα. Ο agent ενεργοποιείται στο επόμενο βήμα — προς το παρόν
-             το ημερολόγιο διαβάζει κανονικά από τη βάση.</p>
+          <p>Καλησπέρα! Είμαι η ρεσεψιόν του Φυσικοθεραπευτηρίου Ρέα. Πώς μπορώ να
+             σας εξυπηρετήσω;</p>
         </div>
       </div>
       <form id="composer" class="composer">
-        <input id="input" type="text" placeholder="Έρχεται στο βήμα 3…" disabled autocomplete="off">
-        <button type="submit" disabled>Αποστολή</button>
+        <input id="input" type="text" placeholder="Γράψτε το μήνυμά σας…" autocomplete="off" maxlength="500">
+        <button type="submit">Αποστολή</button>
       </form>
     </section>
 

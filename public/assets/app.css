@@ -145,3 +145,14 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .card.is-new { animation: none; }
 }
+
+.msg.typing { display: flex; gap: .3rem; align-self: flex-start; padding: .875rem; }
+.msg.typing i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .35; }
+@keyframes blink { 50% { opacity: 1; } }
+.msg.typing i:nth-child(1) { animation: blink 1.2s infinite .0s; }
+.msg.typing i:nth-child(2) { animation: blink 1.2s infinite .2s; }
+.msg.typing i:nth-child(3) { animation: blink 1.2s infinite .4s; }
+.msg.error { background: #FBEAEA; color: #8A2B2B; align-self: flex-start; }
+@media (prefers-reduced-motion: reduce) { .msg.typing i { animation: none; opacity: .6; } }
+
+.msg p { white-space: pre-wrap; }

@@ -84,3 +84,67 @@ resetBtn.addEventListener('click', async () => {
 });
 
 refresh();
+
+const messages = document.getElementById('messages');
+const composer = document.getElementById('composer');
+const input    = document.getElementById('input');
+const sendBtn  = composer.querySelector('button');
+
+function bubble(role, text) {
+  const el = document.createElement('div');
+  el.className = `msg ${role}`;
+  el.innerHTML = `<p>${escapeHtml(text)}</p>`;
+  messages.append(el);
+  messages.scrollTop = messages.scrollHeight;
+  return el;
+}
+
+function typingIndicator() {
+  const el = document.createElement('div');
+  el.className = 'msg agent typing';
+  el.innerHTML = '<i></i><i></i><i></i>';
+  messages.append(el);
+  messages.scrollTop = messages.scrollHeight;
+  return el;
+}
+
+const ERRORS = {
+  session_limit:     'Το demo έχει όριο μηνυμάτων ανά επισκέπτη. Πατήστε «Επαναφορά demo».',
+  message_too_long:  'Το μήνυμα είναι πολύ μεγάλο.',
+  agent_unavailable: 'Η ρεσεψιόν δεν αποκρίνεται αυτή τη στιγμή. Δοκιμάστε ξανά.',
+};
+
+composer.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const text = input.value.trim();
+  if (!text) return;
+
+  bubble('user', text);
+  input.value = '';
+  input.disabled = sendBtn.disabled = true;
+  const typing = typingIndicator();
+
+  try {
+    const res  = await fetch('/api/chat.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    });
+    const data = await res.json();
+    typing.remove();
+
+    if (!res.ok) {
+      bubble('error', ERRORS[data.error] ?? 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.');
+    } else {
+      bubble('agent', data.reply);
+      await refresh();
+    }
+  } catch (err) {
+    typing.remove();
+    bubble('error', 'Δεν υπάρχει σύνδεση. Ελέγξτε το δίκτυο.');
+    console.error(err);
+  } finally {
+    input.disabled = sendBtn.disabled = false;
+    input.focus();
+  }
+});
