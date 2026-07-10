@@ -4,6 +4,26 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 
 /**
+ * Sent on every HTML response. The CSP is the meaningful one: the agent writes
+ * customer names into the calendar, so even if an escaping bug ever let markup
+ * through, the browser refuses to execute it.
+ */
+function securityHeaders(): void {
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: no-referrer');
+    header('X-Frame-Options: DENY');
+    header(
+        "Content-Security-Policy: default-src 'self'; " .
+        "script-src 'self'; " .
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
+        "font-src https://fonts.gstatic.com; " .
+        "img-src 'self' data:; " .
+        "connect-src 'self'; " .
+        "frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+    );
+}
+
+/**
  * An API endpoint must emit JSON and nothing else. A PHP warning printed before
  * the opening brace breaks JSON.parse() on the client, and the bug then looks
  * like it lives in the frontend. So: warnings become exceptions, exceptions
@@ -14,6 +34,7 @@ function apiBoot(): void {
     error_reporting(E_ALL);
     header('Content-Type: application/json; charset=utf-8');
     header('Cache-Control: no-store');
+    header('X-Content-Type-Options: nosniff');
 
     set_error_handler(
         fn(int $no, string $msg, string $file, int $line)

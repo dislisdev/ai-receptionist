@@ -6,7 +6,7 @@ require_once __DIR__ . '/bootstrap.php';
 const ANTHROPIC_URL     = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 
-/** The API was unreachable, or answered with something other than 200. */
+/** The API was unreachable, misconfigured, or answered with something other than 200. */
 class ClaudeException extends RuntimeException {}
 
 /**
@@ -15,10 +15,16 @@ class ClaudeException extends RuntimeException {}
  * Sonnet 5 rejects temperature and top_p, so neither is sent. Adaptive thinking
  * is on by default at high effort; a receptionist does not need it, and `low`
  * keeps replies fast. The model still thinks when a turn genuinely calls for it.
+ *
+ * Every failure path logs under the same [claude] prefix. One subsystem, one
+ * prefix: that is what makes a log filter useful at 2am.
  */
 function callClaude(array $messages, string $system, array $tools = []): array {
     $key = env('ANTHROPIC_API_KEY');
-    if ($key === '') throw new ClaudeException('ANTHROPIC_API_KEY is not set');
+    if ($key === '') {
+        error_log('[claude] ANTHROPIC_API_KEY is not set');
+        throw new ClaudeException('missing api key');
+    }
 
     $body = [
         'model'         => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
@@ -48,15 +54,20 @@ function callClaude(array $messages, string $system, array $tools = []): array {
     $err    = curl_error($ch);
 
     if ($raw === false) {
-        throw new ClaudeException("network failure: $err");
+        error_log("[claude] network failure: $err");
+        throw new ClaudeException('network failure');
     }
     if ($status !== 200) {
+        // The response body names the exact problem. It never reaches the browser.
         error_log("[claude] HTTP $status: $raw");
         throw new ClaudeException("api returned $status");
     }
 
     $data = json_decode($raw, true);
-    if (!is_array($data)) throw new ClaudeException('malformed response');
+    if (!is_array($data)) {
+        error_log('[claude] malformed response body');
+        throw new ClaudeException('malformed response');
+    }
 
     return $data;
 }

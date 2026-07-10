@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../../src/http.php';
+require_once __DIR__ . '/../../src/ratelimit.php';
 require_once __DIR__ . '/../../src/agent.php';
 
 apiBoot();
@@ -12,6 +13,7 @@ set_time_limit(120);
 
 $sid = sessionId();
 $pdo = db();
+enforceRateLimit($pdo, 'chat');
 ensureSession($pdo, $sid);
 
 $input = json_decode((string)file_get_contents('php://input'), true);
@@ -27,8 +29,8 @@ saveMessage($pdo, $sid, 'user', $text);
 
 try {
     $reply = runAgentTurn($pdo, $sid);
-} catch (ClaudeException $e) {
-    error_log('[chat] ' . $e->getMessage());
+} catch (ClaudeException) {
+    // Already logged under [claude] with the exact cause.
     jsonOut(['error' => 'agent_unavailable'], 502);
 }
 

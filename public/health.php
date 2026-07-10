@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/../src/http.php';
+require_once __DIR__ . '/../src/ratelimit.php';
 
 $sid = sessionId();
+securityHeaders();
 header('Content-Type: text/html; charset=utf-8');
 
 function networkCheck(): string {
@@ -45,6 +47,8 @@ try {
     $checks['Database'] = 'FAIL ' . $e->getMessage();
 }
 
+$rl = rateLimitStatus($pdo ?? db());
+$checks['Demo budget today'] = $rl['today'] . ' / ' . $rl['budget'] . ' requests';
 $checks['Demo week starts'] = demoWeekStart()->format('Y-m-d (l)');
 $checks['Server time']      = date('Y-m-d H:i:s') . ' - ' . date('l');
 $checks['api.anthropic.com'] = networkCheck();

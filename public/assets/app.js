@@ -245,3 +245,9 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+/* Server-side limits, surfaced in the user's language. */
+Object.assign(ERRORS, {
+  rate_limited:      'Πολλά αιτήματα σε σύντομο διάστημα. Δοκιμάστε ξανά σε λίγα λεπτά.',
+  demo_budget_spent: 'Το ημερήσιο όριο του demo εξαντλήθηκε. Δοκιμάστε αύριο.',
+});

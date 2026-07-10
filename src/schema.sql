@@ -41,3 +41,13 @@ CREATE TABLE IF NOT EXISTS conversations (
 
 CREATE INDEX IF NOT EXISTS idx_conv_lookup
     ON conversations (session_id, id);
+
+CREATE TABLE IF NOT EXISTS api_calls (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip_hash    TEXT NOT NULL,
+    endpoint   TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_api_calls_ip   ON api_calls (ip_hash, created_at);
+CREATE INDEX IF NOT EXISTS idx_api_calls_time ON api_calls (created_at);
