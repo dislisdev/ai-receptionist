@@ -24,7 +24,7 @@ securityHeaders();
   <header>
     <div class="brand">
       <div class="logo" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h3.4l2-5.6 3.6 11 2.4-7.8 1.5 2.4H21"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17c3-1 5-3.5 7-7s4-6 9-6"/><circle cx="19" cy="4" r="1.6" fill="#fff" stroke="none"/></svg>
       </div>
       <div class="brand-txt">
         <span class="brand-name">Φυσικοθεραπευτήριο <em>Κίνηση</em></span>
