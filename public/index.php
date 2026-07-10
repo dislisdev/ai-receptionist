@@ -1,37 +1,14 @@
 <?php
 declare(strict_types=1);
 
-date_default_timezone_set('Europe/Athens');
+require_once __DIR__ . '/../src/db.php';
+
+$sid = sessionId();
 header('Content-Type: text/html; charset=utf-8');
 
-/**
- * Reads an env var. Locally it comes from .env; on Railway from the dashboard.
- * FrankenPHP does not always populate getenv(), so we check all three sources.
- */
-function env(string $key, string $default = ''): string {
-    $v = getenv($key);
-    if ($v !== false && $v !== '') return $v;
-    return (string)($_ENV[$key] ?? $_SERVER[$key] ?? $default);
-}
-
-/** Minimal .env loader. No dependencies, no vendor/ directory. */
-function loadEnv(string $path): void {
-    if (!is_readable($path)) return;
-    foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        $line = trim($line);
-        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
-        [$k, $v] = explode('=', $line, 2);
-        $k = trim($k);
-        $v = trim($v, " \t\"'");
-        $_ENV[$k] = $v;
-        putenv("$k=$v");
-    }
-}
-loadEnv(__DIR__ . '/../.env');
-
-/** Can this container actually reach the Anthropic API? */
+/** Can this container reach the Anthropic API? */
 function networkCheck(): string {
-    if (!extension_loaded('curl')) return 'curl extension missing';
+    if (!extension_loaded('curl')) return 'FAIL curl extension missing';
     $ch = curl_init('https://api.anthropic.com/v1/messages');
     curl_setopt_array($ch, [
         CURLOPT_NOBODY         => true,
@@ -42,38 +19,39 @@ function networkCheck(): string {
     curl_exec($ch);
     $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err  = curl_error($ch);
-    // Any HTTP status means the TCP+TLS handshake worked. 401/404/405 are all fine here.
     return $code > 0 ? "reachable (HTTP $code)" : "BLOCKED - $err";
 }
 
-/** Can we actually create and write the database file where DB_PATH points? */
-function storageCheck(): string {
-    $path = env('DB_PATH', './data/app.db');
-    $dir  = dirname($path);
+$checks = [
+    'PHP version'       => PHP_VERSION,
+    'pdo_sqlite'        => extension_loaded('pdo_sqlite') ? 'ok' : 'MISSING',
+    'curl'              => extension_loaded('curl')       ? 'ok' : 'MISSING',
+    'mbstring'          => extension_loaded('mbstring')   ? 'ok' : 'MISSING',
+    'ANTHROPIC_API_KEY' => env('ANTHROPIC_API_KEY') !== '' ? 'set' : 'not set',
+    'ANTHROPIC_MODEL'   => env('ANTHROPIC_MODEL', '(unset)'),
+    'DB_PATH'           => env('DB_PATH', '(unset)'),
+    'DB file (resolved)' => dbPath(),
+];
 
-    if (!is_dir($dir) && !@mkdir($dir, 0775, true)) {
-        return "FAIL cannot create $dir";
-    }
-    $probe = $dir . '/.write-probe';
-    if (@file_put_contents($probe, 'ok') === false) {
-        return "FAIL not writable: $dir";
-    }
-    @unlink($probe);
-    return "writable ($dir)";
+try {
+    $pdo = db();
+    ensureSession($pdo, $sid);
+
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM appointments WHERE session_id = ? AND status = 'confirmed'"
+    );
+    $stmt->execute([$sid]);
+
+    $checks['Database']            = 'connected';
+    $checks['Services seeded']     = (string)$pdo->query('SELECT COUNT(*) FROM services')->fetchColumn();
+    $checks['Your session']        = substr($sid, 0, 8) . '...';
+    $checks['Your appointments']   = (string)$stmt->fetchColumn();
+} catch (Throwable $e) {
+    $checks['Database'] = 'FAIL ' . $e->getMessage();
 }
 
-$checks = [
-    'PHP version'          => PHP_VERSION,
-    'pdo_sqlite'           => extension_loaded('pdo_sqlite') ? 'ok' : 'MISSING',
-    'curl'                 => extension_loaded('curl')       ? 'ok' : 'MISSING',
-    'mbstring'             => extension_loaded('mbstring')   ? 'ok' : 'MISSING',
-    'ANTHROPIC_API_KEY'    => env('ANTHROPIC_API_KEY') !== '' ? 'set' : 'not set',
-    'ANTHROPIC_MODEL'      => env('ANTHROPIC_MODEL', '(unset)'),
-    'DB_PATH'              => env('DB_PATH', '(unset)'),
-    'Storage'              => storageCheck(),
-    'Server time (Athens)' => date('Y-m-d H:i:s') . ' - ' . date('l'),
-    'api.anthropic.com'    => networkCheck(),
-];
+$checks['Server time (Athens)'] = date('Y-m-d H:i:s') . ' - ' . date('l');
+$checks['api.anthropic.com']    = networkCheck();
 ?>
 <!doctype html>
 <html lang="el">
@@ -92,14 +70,12 @@ $checks = [
   </style>
 </head>
 <body>
-  <h1>AI Receptionist - step 0 health check</h1>
+  <h1>AI Receptionist - step 1 health check</h1>
   <table>
     <?php foreach ($checks as $label => $value): ?>
-      <?php
-        $bad = str_contains($value, 'MISSING')
-            || str_contains($value, 'BLOCKED')
-            || str_contains($value, 'FAIL');
-      ?>
+      <?php $bad = str_contains($value, 'MISSING')
+                || str_contains($value, 'BLOCKED')
+                || str_contains($value, 'FAIL'); ?>
       <tr>
         <td><?= htmlspecialchars($label) ?></td>
         <td class="<?= $bad ? 'bad' : 'ok' ?>"><?= htmlspecialchars($value) ?></td>
