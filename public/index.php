@@ -19,6 +19,8 @@ securityHeaders();
 <body data-tab="chat">
 <div class="app">
 
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute"><linearGradient id="rhea-grad" gradientUnits="userSpaceOnUse" x1="5" y1="2" x2="20" y2="21"><stop offset="0%" stop-color="#12a594"/><stop offset="55%" stop-color="#4a8fd0"/><stop offset="100%" stop-color="#7c5cd6"/></linearGradient><symbol id="rhea-mark" viewBox="0 0 24 24"><path d="M12 2.4l1.7 4.5 4.5 1.7-4.5 1.7L12 14.8l-1.7-4.5L5.8 8.6l4.5-1.7z"/><path d="M18.7 14l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" opacity=".55"/></symbol></svg>
+
   <header>
     <div class="brand">
       <div class="logo" aria-hidden="true">
@@ -47,13 +49,13 @@ securityHeaders();
       <div id="chat-messages">
         <div class="msg msg--bot">
           <div class="avatar" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M18 19a2 2 0 0 1-2 2h-3"/><rect x="2.5" y="13.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6" rx="1.6"/></svg>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="url(#rhea-grad)"><use href="#rhea-mark"/></svg>
           </div>
           <div class="bubble">Γεια σας! Είμαι η Ρέα, η ψηφιακή ρεσεψιόν του Φυσικοθεραπευτηρίου Κίνηση. Μπορώ να κλείσω ραντεβού, να ελέγξω διαθεσιμότητα ή να σας ενημερώσω για τις υπηρεσίες μας. Πώς μπορώ να βοηθήσω;</div>
         </div>
         <div id="typing-indicator" class="msg msg--bot" hidden>
           <div class="avatar" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M18 19a2 2 0 0 1-2 2h-3"/><rect x="2.5" y="13.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6" rx="1.6"/></svg>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="url(#rhea-grad)"><use href="#rhea-mark"/></svg>
           </div>
           <div class="bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
         </div>

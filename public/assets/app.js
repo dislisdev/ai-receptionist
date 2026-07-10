@@ -15,7 +15,7 @@ const fmtHour = h => String(h).padStart(2, '0') + ':00';
 const GR_MONTHS = ['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου',
                    'Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
 
-const AVATAR_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><path d="M18 19a2 2 0 0 1-2 2h-3"/><rect x="2.5" y="13.5" width="4" height="6" rx="1.6"/><rect x="17.5" y="13.5" width="4" height="6" rx="1.6"/></svg>';
+const AVATAR_SVG = '<svg viewBox="0 0 24 24" fill="url(#rhea-grad)" aria-hidden="true"><use href="#rhea-mark"/></svg>';
 
 /* -------------------- state -------------------- */
 

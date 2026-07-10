@@ -234,3 +234,37 @@ footer{
 @media (max-width:880px){
   #chat-input{font-size:16px}
 }
+
+/* Rhea's mark stands on its own: no container, a gradient built from the
+   palette's own tokens. Static when idle, alive while she thinks — motion
+   here encodes state, it does not decorate. */
+.avatar{width:28px;height:28px;background:none;box-shadow:none;border-radius:0}
+.avatar svg{width:100%;height:100%;display:block}
+
+@keyframes rheaThink{
+  0%,100%{transform:rotate(0deg)  scale(1);    opacity:.6}
+  50%    {transform:rotate(90deg) scale(1.15); opacity:1}
+}
+#typing-indicator .avatar svg{
+  transform-origin:center;
+  animation:rheaThink 1.8s cubic-bezier(.4,0,.2,1) infinite;
+}
+
+@media (prefers-reduced-motion:reduce){
+  #typing-indicator .avatar svg{animation:none;opacity:1}
+}
+
+/* The visitor says "καλησπέρα"; Rhea says everything else. A filled gradient
+   bubble against a hairline one inverted that hierarchy -- the loudest surface
+   carried the least meaning. Both now sit in the same family, one step apart. */
+.msg--bot .bubble{
+  background:var(--teal-050);
+  border-color:var(--teal-100);
+  box-shadow:none;
+}
+.msg--user .bubble{
+  background:var(--teal-600);
+  box-shadow:0 1px 3px rgba(18,51,47,.10);
+}
+.msg--error .bubble{background:#fdecec;border-color:#f3c1c1;color:#8a2b2b}
+#typing-indicator .bubble{background:var(--teal-050);border-color:var(--teal-100)}
